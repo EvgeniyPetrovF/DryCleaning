@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useMMKVString} from 'react-native-mmkv';
-import AuthAPI from '../../../services/API/Auth';
 import {StorageKeys} from '../../../models/storage';
+import AuthAPI from '../../../services/API/Auth';
 
 const useLoginForm = () => {
   const [nickName, setNickName] = useState('');

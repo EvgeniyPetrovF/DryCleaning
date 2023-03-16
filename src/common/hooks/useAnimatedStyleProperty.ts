@@ -1,5 +1,5 @@
-import {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 import {TextStyle, ViewStyle} from 'react-native/types';
+import {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 
 const useAnimatedStyleProperty = <T = string>(
   styleProperty: keyof ViewStyle | keyof TextStyle,

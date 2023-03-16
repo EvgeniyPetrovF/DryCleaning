@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import {dimensions} from '../../../../constants';
 
 export const styles = StyleSheet.create({
   formContainer: {
@@ -7,5 +8,8 @@ export const styles = StyleSheet.create({
     flexShrink: 0,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  bottomOffset: {
+    marginBottom: dimensions.offset.large,
   },
 });

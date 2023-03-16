@@ -1,13 +1,16 @@
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import MainNavigator from '../MainNavigator';
-import LoginScreen from '../../features/Login/screens/LoginScreen';
 import {useMMKVString} from 'react-native-mmkv';
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationOptions,
+} from '@react-navigation/native-stack';
 import {StorageKeys} from '../../models/storage';
+import MainNavigator from '../MainNavigator';
+import LoginStackNavigator from '../SignInStackNavigator';
 
 const Stack = createNativeStackNavigator();
 
-const options = {
+const options: Record<string, NativeStackNavigationOptions> = {
   login: {headerShown: false},
 };
 
@@ -19,7 +22,10 @@ const AppStack = () => {
       {username ? (
         <Stack.Screen name="Main" component={MainNavigator} />
       ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen
+          name="LoginStackNavigator"
+          component={LoginStackNavigator}
+        />
       )}
     </Stack.Navigator>
   );

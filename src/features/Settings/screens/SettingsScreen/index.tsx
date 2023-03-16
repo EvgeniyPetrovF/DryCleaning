@@ -1,10 +1,10 @@
 import React, {FC} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native';
 import {useMMKVString} from 'react-native-mmkv';
-import TextWrapper from '../../../../components/TextWrapper';
-import {styles} from './styles';
 import CustomButton from '../../../../components/CustomButton';
+import TextWrapper from '../../../../components/TextWrapper';
 import {StorageKeys} from '../../../../models/storage';
+import {styles} from './styles';
 
 const SettingsScreen: FC = () => {
   const [username, setUsername] = useMMKVString(StorageKeys.userName);

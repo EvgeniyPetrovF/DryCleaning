@@ -1,14 +1,30 @@
 import {StyleSheet} from 'react-native';
-import {dimensions, text} from '../../../../constants';
+import {colors, dimensions, text} from '../../../../constants';
 
 export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderRadius: dimensions.borderRadius.default,
+    padding: dimensions.offset.normal,
+  },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: dimensions.offset.tiny,
     marginBottom: dimensions.offset.small,
   },
-  nickname: {
+  name: {
     fontWeight: text.weight.medium,
+    fontSize: text.size.big,
+  },
+  service: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  serviceItem: {
+    width: '50%',
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: '3%',
+    top: '3%',
   },
 });

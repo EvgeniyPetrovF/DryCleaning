@@ -1,17 +1,22 @@
-import React, {FC, useCallback, useEffect, useState} from 'react';
-import {FlatList, ListRenderItem, TouchableOpacity, View} from 'react-native';
+import React, {FC, useCallback} from 'react';
+import {
+  FlatList,
+  ListRenderItem,
+  SafeAreaView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Animated from 'react-native-reanimated';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useMMKVString} from 'react-native-mmkv';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {styles} from './styles';
-import DryCleaner, {IDryCleaner} from '../../components/DryCleaner';
+import CustomButton from '../../../../components/CustomButton';
 import Loader from '../../../../components/Loader';
 import TextWrapper from '../../../../components/TextWrapper';
 import {HomeStackParamList} from '../../../../models/navigation';
-import {StorageKeys} from '../../../../models/storage';
-import Animated, {withTiming} from 'react-native-reanimated';
-import useAnimatedStyleProperty from '../../../../common/hooks/useAnimatedStyleProperty';
-import CustomButton from '../../../../components/CustomButton';
+import {IDryCleaner} from '../../../../models/types';
+import DryCleaner from '../../components/DryCleaner';
+import DryCleanerForm from '../../components/DryCleanerForm';
+import useDryCleaners from '../../hooks/useDryCleaners';
+import {styles} from './styles';
 
 const ListEmptyComponent: FC = () => {
   return <TextWrapper>No items</TextWrapper>;
@@ -25,63 +30,32 @@ const ItemSeparatorComponent: FC = () => {
   return <View style={styles.separator} />;
 };
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'DryCleaners'>;
 
-const animationDuration = 300;
+const HomeScreen: FC<Props> = () => {
+  const {
+    showModal,
+    showEditModal,
+    isLoading,
+    isRefreshing,
+    tempDryCleaner,
+    dryCleaners,
+    animatedOpacityStyle,
 
-const HomeScreen: FC<Props> = ({navigation}) => {
-  const [userName] = useMMKVString(StorageKeys.userName);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setisRefreshing] = useState(false);
-  const [dryCleaners, setDryCleaners] = useState<IDryCleaner[]>();
-  const {animatedValue: listOpacity, animatedStyle: animatedOpacityStyle} =
-    useAnimatedStyleProperty('opacity', 0);
-
-  const fetchDryCleaners = async () => {
-    try {
-      if (userName) {
-        // const response = await TweetsAPI.getTweets({userName});
-        // setDryCleaners(response);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const initialFetchDryCleaners = async () => {
-    setIsLoading(true);
-    await fetchDryCleaners();
-    setIsLoading(false);
-  };
-
-  const refreshDryCleaners = async () => {
-    setisRefreshing(true);
-    await fetchDryCleaners();
-    setisRefreshing(false);
-  };
-
-  useEffect(() => {
-    initialFetchDryCleaners();
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
-      listOpacity.value = withTiming(1, {duration: animationDuration});
-    } else {
-      listOpacity.value = 0;
-    }
-  }, [listOpacity, isLoading]);
+    addDryCleaner,
+    deleteDryCleaner,
+    editDryCleaner,
+    refreshDryCleaners,
+    onDryCleanerPress,
+    closeAddModal,
+    openAddModal,
+    closeEditModal,
+  } = useDryCleaners();
 
   const renderDryCleaner: ListRenderItem<IDryCleaner> = ({item}) => {
-    const navigateToOrders = () => {
-      if (userName) {
-        navigation.navigate('Orders', {item, userName});
-      }
-    };
-
     return (
-      <TouchableOpacity onPress={navigateToOrders}>
-        <DryCleaner {...item} />
+      <TouchableOpacity onPress={() => onDryCleanerPress(item)}>
+        <DryCleaner {...item} deleteDryCleaner={deleteDryCleaner} />
       </TouchableOpacity>
     );
   };
@@ -89,18 +63,17 @@ const HomeScreen: FC<Props> = ({navigation}) => {
   const ListHeaderComponent: FC = useCallback(() => {
     return (
       <View style={styles.headerContainer}>
-        <CustomButton label="Add" onPress={() => {}} />
-        <TextWrapper style={styles.listHeader}>{`${userName}`}</TextWrapper>
+        <CustomButton label="Add" onPress={openAddModal} />
       </View>
     );
-  }, [userName]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       {isLoading ? (
         <Loader />
       ) : (
-        <Animated.View style={animatedOpacityStyle}>
+        <Animated.View style={[animatedOpacityStyle, styles.listContainer]}>
           <FlatList
             data={dryCleaners}
             renderItem={renderDryCleaner}
@@ -113,7 +86,21 @@ const HomeScreen: FC<Props> = ({navigation}) => {
           />
         </Animated.View>
       )}
+      <DryCleanerForm
+        buttonTitle="Add Dry Cleaner"
+        onButtonPress={addDryCleaner}
+        visible={showModal}
+        closeModal={closeAddModal}
+      />
+      <DryCleanerForm
+        buttonTitle="Edit Dry Cleaner"
+        onButtonPress={editDryCleaner}
+        visible={showEditModal}
+        closeModal={closeEditModal}
+        dryCleaner={tempDryCleaner}
+      />
     </SafeAreaView>
   );
 };
+
 export default HomeScreen;

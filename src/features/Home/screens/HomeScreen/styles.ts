@@ -4,9 +4,12 @@ import {colors, dimensions, text} from '../../../../constants';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: dimensions.offset.normal,
+    marginTop: dimensions.offset.normal,
+  },
+  listContainer: {
+    width: '100%',
   },
   listHeader: {
     fontSize: text.size.big,
@@ -20,5 +23,6 @@ export const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'center',
+    marginBottom: dimensions.offset.normal,
   },
 });
