@@ -15,8 +15,8 @@ export const styles = StyleSheet.create({
   },
   deleteButton: {
     position: 'absolute',
-    right: '3%',
-    top: '3%',
+    right: dimensions.offset.tiny,
+    top: dimensions.offset.tiny,
   },
   deleteImage: {
     width: 16,

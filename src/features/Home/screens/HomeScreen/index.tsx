@@ -15,6 +15,8 @@ import {HomeStackParamList} from '../../../../models/navigation';
 import {IDryCleaner} from '../../../../models/types';
 import DryCleaner from '../../components/DryCleaner';
 import DryCleanerForm from '../../components/DryCleanerForm';
+import useAnimatedList from '../../hooks/useAnimatedList';
+import useDatabase from '../../hooks/useDatabase';
 import useDryCleaners from '../../hooks/useDryCleaners';
 import {styles} from './styles';
 
@@ -23,7 +25,7 @@ const ListEmptyComponent: FC = () => {
 };
 
 const keyExtractor = (item: IDryCleaner) => {
-  return item.id;
+  return `${item.id}`;
 };
 
 const ItemSeparatorComponent: FC = () => {
@@ -33,6 +35,7 @@ const ItemSeparatorComponent: FC = () => {
 type Props = NativeStackScreenProps<HomeStackParamList, 'DryCleaners'>;
 
 const HomeScreen: FC<Props> = () => {
+  const db = useDatabase();
   const {
     showModal,
     showEditModal,
@@ -40,7 +43,6 @@ const HomeScreen: FC<Props> = () => {
     isRefreshing,
     tempDryCleaner,
     dryCleaners,
-    animatedOpacityStyle,
 
     addDryCleaner,
     deleteDryCleaner,
@@ -50,7 +52,9 @@ const HomeScreen: FC<Props> = () => {
     closeAddModal,
     openAddModal,
     closeEditModal,
-  } = useDryCleaners();
+  } = useDryCleaners(db);
+
+  const {animatedOpacityStyle} = useAnimatedList({isLoading});
 
   const renderDryCleaner: ListRenderItem<IDryCleaner> = ({item}) => {
     return (
