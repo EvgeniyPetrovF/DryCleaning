@@ -15,7 +15,7 @@ export interface DryCleanerForm {
   buttonTitle: string;
   onButtonPress: (dryCleaner: IDryCleaner) => Promise<void>;
   closeModal: () => void;
-  dryCleaner?: IDryCleaner;
+  dryCleaner?: null | IDryCleaner;
 }
 
 const DryCleanerForm: FC<DryCleanerForm> = ({
@@ -42,7 +42,7 @@ const DryCleanerForm: FC<DryCleanerForm> = ({
     await onButtonPress({
       name,
       description,
-      id: dryCleaner?.id as string,
+      id: dryCleaner?.id as number,
       services,
       images,
     });
@@ -64,6 +64,7 @@ const DryCleanerForm: FC<DryCleanerForm> = ({
           ...images,
           ...result.assets.map<LocalImage>(asset => ({
             ...asset,
+            id: asset.id as any,
             currentStatus: 'new',
           })),
         ]);

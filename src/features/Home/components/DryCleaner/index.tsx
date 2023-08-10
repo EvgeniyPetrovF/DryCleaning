@@ -7,7 +7,7 @@ import {IDryCleaner} from '../../../../models/types';
 import {styles} from './styles';
 
 type Props = {
-  deleteDryCleaner?: (id: string) => void;
+  deleteDryCleaner?: (id: number) => void;
 };
 
 const DryCleaner: FC<IDryCleaner & Props> = ({

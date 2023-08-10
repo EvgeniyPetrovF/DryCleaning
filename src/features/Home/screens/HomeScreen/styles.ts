@@ -6,9 +6,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingHorizontal: dimensions.offset.normal,
-    marginTop: dimensions.offset.normal,
   },
   listContainer: {
+    marginVertical: dimensions.offset.normal,
     width: '100%',
   },
   listHeader: {

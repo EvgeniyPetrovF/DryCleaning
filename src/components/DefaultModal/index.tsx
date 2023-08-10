@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {SafeAreaView, ScrollView} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import Modal, {ModalProps} from 'react-native-modal';
 import styles from './styles';
 
@@ -15,21 +15,21 @@ const DefaultModal: FC<DefaultModalProps> = ({
 }) => {
   return (
     <Modal
-      {...props}
       isVisible={isVisible}
       propagateSwipe
       avoidKeyboard
       onBackdropPress={closeModal}
       style={styles.container}
       animationIn="fadeIn"
-      animationOut="fadeOut">
-      <SafeAreaView>
+      animationOut="fadeOut"
+      {...props}>
+      <View>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.modalView}>
           {children}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 };

@@ -1,126 +1,92 @@
-import {useEffect, useRef, useState} from 'react';
-import {withTiming} from 'react-native-reanimated';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
-import useAnimatedStyleProperty from '../../../common/hooks/useAnimatedStyleProperty';
-import {IDryCleaner} from '../../../models/types';
-import {Database} from '../../../services/database';
+import {useCallback, useEffect, useState} from 'react';
+import {IDryCleaner, UseDatabaseType} from '../../../models/types';
 
-const animationDuration = 300;
-
-const useDryCleaners = () => {
+const useDryCleaners = ({
+  addDryCleanerToDB,
+  deleteDryCleanerFromDB,
+  editDryCleanerFromDB,
+  fetchDryCleaners,
+}: UseDatabaseType) => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [tempDryCleaner, setTempDryCleaner] = useState<IDryCleaner>();
+  const [tempDryCleaner, setTempDryCleaner] = useState<IDryCleaner | null>();
   const [dryCleaners, setDryCleaners] = useState<IDryCleaner[]>([]);
-  const db = useRef<SQLiteDatabase | null>(null);
 
-  const {animatedValue: listOpacity, animatedStyle: animatedOpacityStyle} =
-    useAnimatedStyleProperty('opacity', 0);
+  const refreshDryCleaners = useCallback(async () => {
+    setIsRefreshing(true);
+    const storedItems = await fetchDryCleaners();
 
-  const addDryCleaner = async (dryCleaner: IDryCleaner) => {
-    const newDryCleaner = {
-      ...dryCleaner,
-      id: dryCleaners.length ? dryCleaners[dryCleaners.length - 1].id + 1 : '1',
-    };
-    setDryCleaners([...dryCleaners, newDryCleaner]);
-    if (db.current) {
-      await Database.addDryCleanerToTable(db.current, newDryCleaner);
-      await refreshDryCleaners();
+    if (storedItems?.length) {
+      setDryCleaners(storedItems);
     }
 
-    setShowModal(false);
-    setTempDryCleaner(undefined);
-  };
+    setIsRefreshing(false);
+  }, [fetchDryCleaners]);
 
-  const deleteDryCleaner = async (id: string) => {
-    if (db.current) {
-      await Database.deleteDryCleanerFromTable(db.current, id);
-    }
-    setDryCleaners(prev => prev.filter(cleaner => cleaner.id !== id));
-  };
+  const addDryCleaner = useCallback(
+    async (dryCleaner: IDryCleaner) => {
+      const newDryCleaner = {
+        ...dryCleaner,
+        id: dryCleaners.length ? dryCleaners[dryCleaners.length - 1].id + 1 : 1,
+      };
 
-  const editDryCleaner = async (updatedDryCleaner: IDryCleaner) => {
-    setDryCleaners(prev =>
-      prev.map(cleaner =>
-        cleaner.id === updatedDryCleaner.id ? updatedDryCleaner : cleaner,
-      ),
-    );
+      try {
+        await addDryCleanerToDB(newDryCleaner);
+        await fetchDryCleaners();
 
-    if (db.current) {
-      await Database.saveDryCleanerToTable(db.current, updatedDryCleaner);
-      updatedDryCleaner.services
-        .filter(item => item.currentStatus === 'deleted')
-        .forEach(item => {
-          (async () => {
-            await Database.deleteServiceFromTable(db.current!, item.id);
-          })();
-        });
-      updatedDryCleaner.images
-        .filter(item => item.currentStatus === 'deleted')
-        .forEach(item => {
-          (async () => {
-            await Database.deleteImageFromTable(db.current!, item.id!);
-          })();
-        });
-      await initialFetchDryCleaners();
-    }
-  };
+        setDryCleaners([...dryCleaners, newDryCleaner]);
 
-  const fetchDryCleaners = async () => {
+        setShowModal(false);
+      } catch (error) {
+        console.log((error as Error).message);
+      }
+    },
+    [addDryCleanerToDB, dryCleaners, fetchDryCleaners],
+  );
+
+  const deleteDryCleaner = async (id: number) => {
     try {
-      if (!db.current) {
-        db.current = await Database.getDBConnection();
-      }
-      await Database.createDryCleanersTable(db.current);
-      const storedTodoItems = await Database.getDryCleaners(db.current);
-
-      if (storedTodoItems.length) {
-        setDryCleaners(storedTodoItems);
-      }
+      await deleteDryCleanerFromDB(id);
+      setDryCleaners(prev => prev.filter(cleaner => cleaner.id !== id));
     } catch (error) {
-      console.log(error);
+      console.log((error as Error).message);
+    }
+  };
+
+  const editDryCleaner = async (dryCleaner: IDryCleaner) => {
+    const updatedDryCleaner = {...dryCleaner};
+    try {
+      await editDryCleanerFromDB(updatedDryCleaner);
+      setDryCleaners(prev =>
+        prev.map(cleaner =>
+          cleaner.id === updatedDryCleaner.id ? updatedDryCleaner : cleaner,
+        ),
+      );
+
+      await initialFetchDryCleaners();
+    } catch (error) {
+      console.log((error as Error).message);
     }
   };
 
   const initialFetchDryCleaners = async () => {
     setIsLoading(true);
-    await fetchDryCleaners();
+    const storedItems = await fetchDryCleaners();
+    if (storedItems?.length) {
+      setDryCleaners(storedItems);
+    }
     setIsLoading(false);
   };
 
-  const refreshDryCleaners = async () => {
-    setIsRefreshing(true);
-    await fetchDryCleaners();
-    setIsRefreshing(false);
-  };
-
   useEffect(() => {
-    (async () => {
-      // await Database.deleteDB();
-      await initialFetchDryCleaners();
-    })();
-
-    return () => {
-      if (db.current) {
-        db.current.close();
-        db.current = null;
-      }
-    };
+    initialFetchDryCleaners();
   }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
-      listOpacity.value = withTiming(1, {duration: animationDuration});
-    } else {
-      listOpacity.value = 0;
-    }
-  }, [listOpacity, isLoading]);
 
   const onDryCleanerPress = (item: IDryCleaner) => {
     setTempDryCleaner(item);
-    setShowEditModal(true);
+    openEditModal();
   };
 
   const closeAddModal = () => {
@@ -135,6 +101,10 @@ const useDryCleaners = () => {
     setShowEditModal(false);
   };
 
+  const openEditModal = () => {
+    setShowEditModal(true);
+  };
+
   return {
     showModal,
     showEditModal,
@@ -142,7 +112,6 @@ const useDryCleaners = () => {
     isRefreshing,
     tempDryCleaner,
     dryCleaners,
-    animatedOpacityStyle,
 
     addDryCleaner,
     deleteDryCleaner,
