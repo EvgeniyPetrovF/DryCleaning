@@ -1,7 +1,6 @@
 import React from 'react';
 import {ActivityIndicator, View} from 'react-native';
 import TextWrapper from '../TextWrapper';
-
 import {styles} from './styles';
 
 interface LoaderProps {

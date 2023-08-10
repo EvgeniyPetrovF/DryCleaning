@@ -1,19 +1,30 @@
 import * as React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {
+  BottomTabNavigationOptions,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
 import SettingsScreen from '../../features/Settings/screens/SettingsScreen';
-import AdminStackNavigator from '../AdminStackNavigator';
-import OrdersScreen from '../../features/Home/screens/OrdersScreen';
+import HomeStackNavigator from '../HomeStackNavigator';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const options: Record<string, BottomTabNavigationOptions> = {
+  homeStackNavigator: {
+    tabBarLabel: 'Home',
+    headerShown: false,
+  },
+};
 
 const MainNavigator = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="HomeStackNavigator" component={AdminStackNavigator} />
-
-      <Stack.Screen name="Orders" component={OrdersScreen} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-    </Stack.Navigator>
+    <Tab.Navigator>
+      <Tab.Screen
+        name="HomeStackNavigator"
+        component={HomeStackNavigator}
+        options={options.homeStackNavigator}
+      />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
   );
 };
 

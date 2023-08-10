@@ -1,6 +1,7 @@
 export default {
   primary: '#4094E1',
   black: '#000000',
+  transparentBlack: 'rgba(28,26,47, 0.4)',
   white: '#FFFFFF',
   gray: '#D2D2D6',
   athensGray: '#F5F7F9',

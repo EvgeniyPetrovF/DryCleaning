@@ -1,10 +1,12 @@
 import React, {useEffect} from 'react';
 import {
   NativeSyntheticEvent,
+  StyleProp,
   TextInput,
   TextInputFocusEventData,
   TextInputProps,
   View,
+  ViewStyle,
 } from 'react-native';
 import Animated, {useAnimatedStyle, withTiming} from 'react-native-reanimated';
 import useAnimatedStyleProperty from '../../common/hooks/useAnimatedStyleProperty';
@@ -15,6 +17,7 @@ import {styles} from './styles';
 interface TextInputWrapperProps extends TextInputProps {
   label?: string;
   error?: string;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const animationDuration = 300;
@@ -25,6 +28,7 @@ const TextInputWrapper = ({
   error,
   onFocus,
   onBlur,
+  containerStyle,
   ...props
 }: TextInputWrapperProps) => {
   const {animatedValue: animatedColor, animatedStyle: animatedTitleStyle} =
@@ -61,7 +65,7 @@ const TextInputWrapper = ({
   }, [error, errorOpacity]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       {label && (
         <Animated.Text style={animatedTitleStyle}>
           <TextWrapper>{label}</TextWrapper>

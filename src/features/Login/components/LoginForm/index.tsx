@@ -3,7 +3,6 @@ import {View} from 'react-native';
 import CustomButton from '../../../../components/CustomButton';
 import TextInputWrapper from '../../../../components/TextInputWrapper';
 import useLoginForm from '../../hooks/useLogin';
-
 import {styles} from './styles';
 
 const LoginForm = () => {
@@ -19,6 +18,7 @@ const LoginForm = () => {
         onChangeText={onChangeText}
         placeholder="Nickname"
         error={error}
+        containerStyle={styles.bottomOffset}
       />
       <CustomButton
         label="Login"
